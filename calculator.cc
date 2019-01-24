@@ -8,9 +8,6 @@ Calculator::Calculator()
     , mRight(0)
     , mResult()
 {
-    std::cout << "Minimum value for double: " << std::numeric_limits<double>::min() << std::endl;
-    std::cout << "Maximum value for double: " << std::numeric_limits<double>::max() << std::endl;
-    std::cout << "Epsilon value for double: " << std::numeric_limits<double>::epsilon() << std::endl;
 }
 
 Calculator::~Calculator()
@@ -36,7 +33,8 @@ std::vector<std::string> Calculator::split(const std::string & evaluation, const
 
 bool Calculator::isNum(const std::string & str)
 {
-    return (str.find_first_not_of("123456789.") == std::string::npos);
+    // e notation could also be wrong
+    return (str.find_first_not_of("0123456789.-+e") == std::string::npos);
 }
 
 void Calculator::clear()
@@ -63,11 +61,13 @@ bool Calculator::isZero(const double & value)
 bool Calculator::isOutOfRange(const double & value)
 {
     return (value > std::numeric_limits<double>::max()
-         || value < std::numeric_limits<double>::min());
+         /*|| value < std::numeric_limits<double>::min()*/);
 }
 
 double Calculator::calculate(const std::string & evaluation)
 {
+    const int cMAX_OPERANDS_AMOUNT = 2;
+    const int cMIN_OPERANDS_AMOUNT = 1;
     if (evaluation.empty())
     {
         mResult.push(0);
@@ -83,10 +83,10 @@ double Calculator::calculate(const std::string & evaluation)
             if (elem == "+")
             {
                 std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != 2)
+                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
                 {
                     clear();
-                    return 0;
+                    throw InputException();
                 }
                 setOperands();
                 auto result = mLeft + mRight;
@@ -97,16 +97,16 @@ double Calculator::calculate(const std::string & evaluation)
                 else
                 {
                     clear();
-                    return 0;
+                    throw NumericLimitsException();
                 }
             }
             else if (elem == "-")
             {
                 std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != 2)
+                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
                 {
                     clear();
-                    return 0;
+                    throw InputException();
                 }
                 setOperands();
                 auto result = mLeft - mRight;
@@ -117,16 +117,16 @@ double Calculator::calculate(const std::string & evaluation)
                 else
                 {
                     clear();
-                    return 0;
+                    throw NumericLimitsException();
                 }
             }
             else if (elem == "*")
             {
                 std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != 2)
+                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
                 {
                     clear();
-                    return 0;
+                    throw InputException();
                 }
                 setOperands();
                 auto result = mLeft * mRight;
@@ -137,16 +137,16 @@ double Calculator::calculate(const std::string & evaluation)
                 else
                 {
                     clear();
-                    return 0;
+                    throw NumericLimitsException();
                 }
             }
             else if (elem == "/")
             {
                 std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != 2)
+                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
                 {
                     clear();
-                    return 0;
+                    throw InputException();
                 }
                 setOperands();
                 if (!isZero(mRight))
@@ -159,13 +159,13 @@ double Calculator::calculate(const std::string & evaluation)
                     else
                     {
                         clear();
-                        return 0;
+                        throw NumericLimitsException();
                     }
                 }
                 else
                 {
                     clear();
-                    return 0;
+                    throw DivideByZeroException();
                 }
             }
             else if (isNum(elem))
@@ -175,13 +175,17 @@ double Calculator::calculate(const std::string & evaluation)
             else
             {
                 clear();
-                return 0;
+                throw InputException();
             }
-            std::cout << "stack: " << mResult.top() << std::endl;
         }
     }
 
-    double r = (mResult.size() == 1) ? mResult.top() : 0;
+    if (mResult.size() != cMIN_OPERANDS_AMOUNT)
+    {
+        clear();
+        throw InputException();
+    }
+    auto res = mResult.top();
     clear();
-    return r;
+    return res;
 }

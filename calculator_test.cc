@@ -1,3 +1,4 @@
+#include <iostream>
 #include "gtest/gtest.h"
 #include "calculator.h"
 
@@ -53,8 +54,15 @@ TEST(CalculatorTest, TestCalculateLongNotation)
 
 TEST(CalculatorTest, TestCalculateDivideByZero)
 {
-    auto result = calc.calculate("5 1 - 0 /");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("5 1 - 0 /");
+    }
+    catch (DivideByZeroException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Divide by zero");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateEmptyString)
@@ -71,66 +79,143 @@ TEST(CalculatorTest, TestCalculateTwoSpaces)
 
 TEST(CalculatorTest, TestCalculateWrongOperands)
 {
-    auto result = calc.calculate("2 2 + 2 2");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("2 2 + 2 2");
+    }
+    catch (InputException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Wrong input");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateWrongOperators)
 {
-    auto result = calc.calculate("2 2 + -");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("2 2 + -");
+    }
+    catch (InputException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Wrong input");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateWrongArguments)
 {
-    auto result = calc.calculate("2 a +");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("2 a +");
+    }
+    catch (InputException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Wrong input");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateWrongSymbolsInString)
 {
-    auto result = calc.calculate("2 3 + qwe");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("2 3 + qwe");
+    }
+    catch (InputException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Wrong input");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateRandomString)
 {
-    auto result = calc.calculate("qwerty");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("qwerty");
+    }
+    catch (InputException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Wrong input");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateOperationsWithDoubles)
 {
-    auto result = calc.calculate("5 2 /");
-    EXPECT_DOUBLE_EQ(2.5, result);
+    try
+    {
+        auto result = calc.calculate("5 2 /");
+    }
+    catch (NumericLimitsException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Numeric limit");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateNumericLimitsWithPlus)
 {
-    auto result = calc.calculate("1.79769e+308 1.79769e+308 +");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("1.79769e+308 1.79769e+308 +");
+    }
+    catch (NumericLimitsException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Numeric limit");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateNumericLimitsWithMinus1)
 {
-    auto result = calc.calculate("-10 1.79769e+308 -");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("-10 1.79769e+308 -");
+    }
+    catch (NumericLimitsException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Numeric limit");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateNumericLimitsWithMinus2)
 {
-    auto result = calc.calculate("1.79769e+307 1.79769e+308 -");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("1.79769e+307 1.79769e+308 -");
+    }
+    catch (NumericLimitsException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Numeric limit");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateNumericLimitsWithMultiply)
 {
-    auto result = calc.calculate("1.79769e+308 1.79769e+308 *");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("1.79769e+308 1.79769e+308 *");
+    }
+    catch (NumericLimitsException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Numeric limit");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }
 
 TEST(CalculatorTest, TestCalculateNumericLimitsWithDivide)
 {
-    auto result = calc.calculate("1 1.79769e+308 /");
-    EXPECT_DOUBLE_EQ(0, result);
+    try
+    {
+        auto result = calc.calculate("1 1.79769e+308 /");
+    }
+    catch (NumericLimitsException & e)
+    {
+        EXPECT_EQ(std::string(e.what()), "Numeric limit");
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
 }

@@ -4,6 +4,30 @@
 #include <vector>
 #include <stack>
 
+struct InputException : public std::exception
+{
+    const char * what () const throw ()
+    {
+        return "Wrong input";
+    }
+};
+
+struct DivideByZeroException : public std::exception
+{
+    const char * what () const throw ()
+    {
+        return "Divide by zero";
+    }
+};
+
+struct NumericLimitsException : public std::exception
+{
+    const char * what () const throw ()
+    {
+        return "Numeric limit";
+    }
+};
+
 class Calculator
 {
 public:
@@ -27,4 +51,3 @@ private:
 };
 
 #endif // CALCULATOR_H
-
