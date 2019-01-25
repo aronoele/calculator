@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
+#include "constants.h"
 #include "calculator.h"
 #include "operation_factory.h"
 
@@ -79,8 +80,7 @@ bool Calculator::isOutOfRange(const double & value)
 void Calculator::performOperation() // TODO: change the name
 {
     std::cout << "size: " << mResult.size() << std::endl;
-    const int cMAX_OPERANDS_AMOUNT = 2;
-    if (mResult.size() != cMAX_OPERANDS_AMOUNT)
+    if (mResult.size() != CalculatorConstants::cMAX_OPERANDS_AMOUNT)
     {
         clear();
         throw InputException();
@@ -105,7 +105,6 @@ void Calculator::performOperation() // TODO: change the name
 
 double Calculator::calculate(const std::string & evaluation)
 {
-    const int cMIN_OPERANDS_AMOUNT = 1;
     if (evaluation.empty())
     {
         mResult.push(0);
@@ -144,7 +143,7 @@ double Calculator::calculate(const std::string & evaluation)
     }
 
     double res;
-    if (mResult.size() == cMIN_OPERANDS_AMOUNT)
+    if (mResult.size() == CalculatorConstants::cMIN_OPERANDS_AMOUNT)
     {
         res = mResult.top();
         clear();
