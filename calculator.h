@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include "operation.h"
 
 struct InputException : public std::exception
 {
@@ -38,16 +39,15 @@ private:
     double             mLeft;
     double             mRight;
     std::stack<double> mResult;
+    Operation*         mOperation;
     std::vector<std::string> split(const std::string & evaluation, const char separator = ' ');
     bool isNum(const std::string & str);
+    bool isOperation(const std::string & str);
     void clear();
     void setOperands();
     bool isOutOfRange(const double & value);
     bool isZero(const double & value);
-    //double plus();
-    //double minus();
-    //double multiple();
-    //double devide();
+    void performOperation();
 };
 
 #endif // CALCULATOR_H

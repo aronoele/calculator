@@ -4,7 +4,7 @@ project(calculator)
 
 add_subdirectory(googletest)
 
-set(SOURCES calculator.cc)
+set(SOURCES calculator.cc operation_factory.cc)
 
 add_executable(calculator_test calculator_test.cc ${SOURCES})
 

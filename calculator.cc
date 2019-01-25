@@ -2,16 +2,23 @@
 #include <sstream>
 #include <limits>
 #include "calculator.h"
+#include "operation_factory.h"
 
 Calculator::Calculator()
     : mLeft(0)
     , mRight(0)
     , mResult()
+    , mOperation(nullptr)
 {
 }
 
 Calculator::~Calculator()
 {
+    if (mOperation)
+    {
+        delete[] mOperation;
+        mOperation = nullptr;
+    }
 }
 
 std::vector<std::string> Calculator::split(const std::string & evaluation, const char separator/* = ' '*/)
@@ -35,6 +42,11 @@ bool Calculator::isNum(const std::string & str)
 {
     // e notation could also be wrong
     return (str.find_first_not_of("0123456789.-+e") == std::string::npos);
+}
+
+bool Calculator::isOperation(const std::string & str)
+{
+    return (str == "+") || (str == "-") || (str == "*") || (str == "/");
 }
 
 void Calculator::clear()
@@ -64,9 +76,35 @@ bool Calculator::isOutOfRange(const double & value)
          /*|| value < std::numeric_limits<double>::min()*/);
 }
 
+void Calculator::performOperation() // TODO: change the name
+{
+    std::cout << "size: " << mResult.size() << std::endl;
+    const int cMAX_OPERANDS_AMOUNT = 2;
+    if (mResult.size() != cMAX_OPERANDS_AMOUNT)
+    {
+        clear();
+        throw InputException();
+    }
+    setOperands();
+    if (mOperation)
+    {
+        auto result = mOperation->execute(mLeft, mRight);
+        //delete[] mOperation;
+        //mOperation = nullptr;
+        if (!isOutOfRange(result))
+        {
+            mResult.push(result);
+        }
+        else
+        {
+            clear();
+            throw NumericLimitsException();
+        }
+    }
+}
+
 double Calculator::calculate(const std::string & evaluation)
 {
-    const int cMAX_OPERANDS_AMOUNT = 2;
     const int cMIN_OPERANDS_AMOUNT = 1;
     if (evaluation.empty())
     {
@@ -79,98 +117,23 @@ double Calculator::calculate(const std::string & evaluation)
         for (const auto & elem : splittedEvaluation)
         {
             std::cout << "elem: " << elem << std::endl;
-            // function is too long
-            if (elem == "+")
+
+            if (isOperation(elem))
             {
-                std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
+                mOperation = OperationFactory::getOperation(elem);
+                try
                 {
-                    clear();
-                    throw InputException();
+                    performOperation();
                 }
-                setOperands();
-                auto result = mLeft + mRight;
-                if (!isOutOfRange(result))
+                catch(std::exception & e)
                 {
-                    mResult.push(result);
-                }
-                else
-                {
-                    clear();
-                    throw NumericLimitsException();
-                }
-            }
-            else if (elem == "-")
-            {
-                std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
-                {
-                    clear();
-                    throw InputException();
-                }
-                setOperands();
-                auto result = mLeft - mRight;
-                if (!isOutOfRange(result))
-                {
-                    mResult.push(result);
-                }
-                else
-                {
-                    clear();
-                    throw NumericLimitsException();
-                }
-            }
-            else if (elem == "*")
-            {
-                std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
-                {
-                    clear();
-                    throw InputException();
-                }
-                setOperands();
-                auto result = mLeft * mRight;
-                if (!isOutOfRange(result))
-                {
-                    mResult.push(result);
-                }
-                else
-                {
-                    clear();
-                    throw NumericLimitsException();
-                }
-            }
-            else if (elem == "/")
-            {
-                std::cout << "size: " << mResult.size() << std::endl;
-                if (mResult.size() != cMAX_OPERANDS_AMOUNT)
-                {
-                    clear();
-                    throw InputException();
-                }
-                setOperands();
-                if (!isZero(mRight))
-                {
-                    auto result = mLeft / mRight;
-                    if (!isOutOfRange(result))
-                    {
-                        mResult.push(result);
-                    }
-                    else
-                    {
-                        clear();
-                        throw NumericLimitsException();
-                    }
-                }
-                else
-                {
-                    clear();
-                    throw DivideByZeroException();
+                    throw e;
                 }
             }
             else if (isNum(elem))
             {
                 mResult.push(std::stod(elem));
+                std::cout << "stack: " << mResult.top() << std::endl;
             }
             else
             {
@@ -180,12 +143,16 @@ double Calculator::calculate(const std::string & evaluation)
         }
     }
 
-    if (mResult.size() != cMIN_OPERANDS_AMOUNT)
+    double res;
+    if (mResult.size() == cMIN_OPERANDS_AMOUNT)
+    {
+        res = mResult.top();
+        clear();
+    }
+    else
     {
         clear();
         throw InputException();
     }
-    auto res = mResult.top();
-    clear();
     return res;
 }
