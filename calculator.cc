@@ -17,7 +17,7 @@ Calculator::~Calculator()
 {
     if (mOperation)
     {
-        delete[] mOperation;
+        delete mOperation;
         mOperation = nullptr;
     }
 }
@@ -79,7 +79,6 @@ bool Calculator::isOutOfRange(const double & value)
 
 void Calculator::performOperation() // TODO: change the name
 {
-    std::cout << "size: " << mResult.size() << std::endl;
     if (mResult.size() != CalculatorConstants::cMAX_OPERANDS_AMOUNT)
     {
         clear();
@@ -88,9 +87,14 @@ void Calculator::performOperation() // TODO: change the name
     setOperands();
     if (mOperation)
     {
+        if (/*divide && */isZero(mRight))
+        {
+            clear();
+            throw DivideByZeroException();
+        }
         auto result = mOperation->execute(mLeft, mRight);
-        //delete[] mOperation;
-        //mOperation = nullptr;
+        delete mOperation;
+        mOperation = nullptr;
         if (!isOutOfRange(result))
         {
             mResult.push(result);
@@ -115,24 +119,14 @@ double Calculator::calculate(const std::string & evaluation)
 
         for (const auto & elem : splittedEvaluation)
         {
-            std::cout << "elem: " << elem << std::endl;
-
             if (isOperation(elem))
             {
                 mOperation = OperationFactory::getOperation(elem);
-                try
-                {
-                    performOperation();
-                }
-                catch(std::exception & e)
-                {
-                    throw e;
-                }
+                performOperation();
             }
             else if (isNum(elem))
             {
                 mResult.push(std::stod(elem));
-                std::cout << "stack: " << mResult.top() << std::endl;
             }
             else
             {
